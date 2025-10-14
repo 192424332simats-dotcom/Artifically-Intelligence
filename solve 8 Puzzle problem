@@ -1,0 +1,66 @@
+import heapq
+
+goal = [[1,2,3],[4,5,6],[7,8,0]]
+
+def h(state):
+    return sum(1 for i in range(3) for j in range(3) if state[i][j] != 0 and state[i][j] != goal[i][j])
+
+def find_zero(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j]==0:
+                return i,j
+
+def neighbors(state):
+    x,y = find_zero(state)
+    moves = [(-1,0),(1,0),(0,-1),(0,1)]
+    result = []
+    for dx,dy in moves:
+        nx,ny = x+dx, y+dy
+        if 0<=nx<3 and 0<=ny<3:
+            new_state = [row[:] for row in state]
+            new_state[x][y], new_state[nx][ny] = new_state[nx][ny], new_state[x][y]
+            result.append(new_state)
+    return result
+
+def a_star(start):
+    open_set = []
+    heapq.heappush(open_set,(h(start),0,start,[]))
+    visited = set()
+    while open_set:
+        f,g,current,path = heapq.heappop(open_set)
+        ct = tuple(tuple(row) for row in current)
+        if current == goal:
+            return path+[current]
+        if ct in visited:
+            continue
+        visited.add(ct)
+        for n in neighbors(current):
+            nt = tuple(tuple(row) for row in n)
+            if nt not in visited:
+                heapq.heappush(open_set,(g+1+h(n),g+1,n,path+[current]))
+    return None
+
+start = [[1,2,3],[4,0,6],[7,5,8]]
+solution = a_star(start)
+for step in solution:
+    for row in step:
+        print(row)
+    print()
+
+    Output
+[1, 2, 3]
+[4, 0, 6]
+[7, 5, 8]
+
+[1, 2, 3]
+[4, 5, 6]
+[7, 0, 8]
+
+[1, 2, 3]
+[4, 5, 6]
+[7, 8, 0]
+
+
+
+  
